@@ -18,17 +18,19 @@ class torch_lightning_DataModule(pl.LightningDataModule):
                  data_dir: str = 'dataset',
                  #metadata:str='flair-one_metadata.json',
                  batch_size: int = 32,
-                 num_workers:int=1,
+                 num_workers:int=0,
+                 #pin_memory: bool= True
                 ):
         super().__init__()
         self.data_dir = data_dir
         #self.metadata=metadata
         self.batch_size = batch_size
         self.num_workers=num_workers
+        #self.pin_memory=pin_memory
     
     def setup(self, stage: str):
         #dataset, metadata, train
-        self.dataset_test = DatasetModule(self.data_dir, train='test') #,self.metadata
+        self.dataset_test = DatasetModule(self.data_dir, train='test') 
         self.dataset_predict = DatasetModule(self.data_dir,train='test')
         self.dataset_train=DatasetModule(self.data_dir,train='train')
         self.dataset_val =DatasetModule(self.data_dir,train='val')
@@ -36,7 +38,7 @@ class torch_lightning_DataModule(pl.LightningDataModule):
 
 
     def train_dataloader(self):
-        return DataLoader(self.dataset_train, batch_size=self.batch_size,num_workers=self.num_workers)
+        return DataLoader(self.dataset_train, batch_size=self.batch_size,num_workers=self.num_workers)#pin_memory=pin_memory
 
     def val_dataloader(self):
         return DataLoader(self.dataset_val, batch_size=self.batch_size,num_workers=self.num_workers)

@@ -4,10 +4,10 @@ import os
 
 os.system('python3 -m pip install gitpython')
 
-import git
-from git import RemoteProgress
+# import git
+# from git import RemoteProgress
 
-repo = git.Repo.clone_from("https://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@github.com/Maherstad/semantic-segmentation-and-domain-adaptation.git", "git_repo") 
+# repo = git.Repo.clone_from("https://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@github.com/Maherstad/semantic-segmentation-and-domain-adaptation.git", "git_repo") 
 
 
 ##part-2 import the raw data
@@ -31,7 +31,7 @@ def download_url(url, save_path, chunk_size=128):
             fd.write(chunk)
             
 for i,j in [('train',train),('test',test),('metadata',metadata)]:
-    download_url(j,f'/workspace/git_repo/{i}.zip',512)
+    download_url(j,f'/workspace/semantic-segmentation-competition/{i}.zip',512)
 
 
 #create the virtual environment
@@ -78,7 +78,7 @@ def execute_commands(cmds:list):
             print('command was not executed')
             
 
-os.chdir("/workspace/git_repo/")
+os.chdir("/workspace/semantic-segmentation-competition/")
 
 cmds_p1=['source activate venv',
          'pip install -r requirements.txt',
@@ -95,11 +95,11 @@ execute_commands(cmds_p1)
 print('unzipping the raw data...(this might take a while)')
 
 
-os.chdir('/workspace/git_repo/raw_dataset/')    
+os.chdir('/workspace/semantic-segmentation-competition/raw_dataset/')    
 cmds_p2=['unzip test.zip','unzip train.zip']
 execute_commands(cmds_p2)
 
-os.chdir('/workspace/git_repo/raw_dataset/')    
+os.chdir('/workspace/semantic-segmentation-competition/raw_dataset/')    
 cmds_p3=['rm test.zip','rm train.zip']
 execute_commands(cmds_p3)
 

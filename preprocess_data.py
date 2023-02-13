@@ -24,16 +24,17 @@ def preprocess(source:str='./raw_dataset', destination:str='./dataset'):
     dataframe_construction_list = []
     dataframe_test_img_construction_list=[]
     # Split the source directory into train and test
-    train_test_split = [i for i in os.listdir(source) if not i.startswith('.')]
-    print(train_test_split)
-    for file in train_test_split:
+    
+    for file in ['train','test']:
         if file == 'train':
             domains = [i for i in os.listdir(f'{source}/{file}') if not i.startswith('.')]
             for domain in domains:
                 zones = [i for i in os.listdir(f'{source}/{file}/{domain}') if not i.startswith('.')]
                 for zone in zones:
                     # Iterate over the image files in the img directory
-                    img_dir = [i for i in os.listdir(f'{source}/{file}/{domain}/{zone}/img') if not i.startswith('.') and i.endswith('.tif')]
+                    img_dir = [i for i in os.listdir(f'{source}/{file}/{domain}/{zone}/img') if not i.startswith('.') 
+                               and i.endswith('.tif')
+                              ]
                     for img_id in img_dir:
                         dataframe_construction_list.append({'image_id': img_id,
                                                             'domain_zone': domain + '_' +zone
@@ -42,7 +43,9 @@ def preprocess(source:str='./raw_dataset', destination:str='./dataset'):
                         shutil.copy(file_name, './dataset/train/img')
 
                     # Iterate over the mask files in the msk directory
-                    msk_dir = [i for i in os.listdir(f'{source}/{file}/{domain}/{zone}/msk') if not i.startswith('.') and i.endswith('.tif')]
+                    msk_dir = [i for i in os.listdir(f'{source}/{file}/{domain}/{zone}/msk') if not i.startswith('.')
+                               and i.endswith('.tif')
+                              ]
                     for msk_id in msk_dir:
                         file_name = f'{source}/{file}/{domain}/{zone}/msk/{msk_id}'
                         shutil.copy(file_name, './dataset/train/msk')
@@ -52,12 +55,14 @@ def preprocess(source:str='./raw_dataset', destination:str='./dataset'):
             for domain in domains:
                 zones = [i for i in os.listdir(f'{source}/{file}/{domain}') if not i.startswith('.')]
                 for zone in zones:
-                    ground_dir=[i for i in os.listdir(f'{source}/{file}/{domain}/{zone}/img') if not i.startswith('.') and  i.endswith('.tif')]
+                    ground_dir=[i for i in os.listdir(f'{source}/{file}/{domain}/{zone}/img') if not i.startswith('.')
+                                and  i.endswith('.tif')
+                               ]
                     for tif_file in ground_dir:
                         dataframe_test_img_construction_list.append({'image_id': tif_file,
                                                             'domain_zone': domain + '_' +zone
                                                            })
-                        if len(dataframe_test_img_construction_list)%100==0:
+                        if len(dataframe_test_img_construction_list)%1000==0:
                             print(len(dataframe_test_img_construction_list))
                         file_name = f'{source}/{file}/{domain}/{zone}/img/{tif_file}'
                         shutil.copy(file_name, './dataset/test/img')
