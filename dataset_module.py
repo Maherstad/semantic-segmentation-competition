@@ -55,7 +55,7 @@ class DatasetModule(torch.utils.data.Dataset): #if False, then test data will be
         #metadata=self.metadata.iloc[:,idx].to_dict()
         if self.train=='train' or 'val':
             img_path=f'dataset/train/img/{self.dataset.iloc[idx]["image_id"]}'
-            print('imagepath',img_path)
+            #print('imagepath',img_path)
             image = ToTensor()(imageio.imread(img_path))
             
             msk_path=f'dataset/train/msk/{self.dataset.iloc[idx]["image_id"].replace("IMG","MSK")}'
@@ -65,7 +65,7 @@ class DatasetModule(torch.utils.data.Dataset): #if False, then test data will be
         elif self.train=='test':
         
             test_img_path=f'dataset/test/img/{self.dataset.iloc[idx]["image_id"]}'
-            print(test_img_path)
+            #print(test_img_path)
             image = ToTensor()(imageio.imread(test_img_path))
             
 
