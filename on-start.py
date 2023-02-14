@@ -1,5 +1,5 @@
 ##part-1 clone the github repo
-#ipython kernel install --user --name=venv'
+#ipython kernel install --user --name=venv
 
 
 import os
