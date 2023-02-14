@@ -17,16 +17,16 @@ class torch_lightning_DataModule(pl.LightningDataModule):
     def __init__(self, 
                  data_dir: str = 'dataset',
                  #metadata:str='flair-one_metadata.json',
-                 batch_size: int = 32,
-                 num_workers:int=0,
-                 #pin_memory: bool= True
+                 batch_size: int = 16,
+                 num_workers:int=8,
+                 pin_memory: bool= True
                 ):
         super().__init__()
         self.data_dir = data_dir
         #self.metadata=metadata
         self.batch_size = batch_size
         self.num_workers=num_workers
-        #self.pin_memory=pin_memory
+        self.pin_memory=pin_memory
     
     def setup(self, stage: str):
         #dataset, metadata, train
@@ -38,16 +38,16 @@ class torch_lightning_DataModule(pl.LightningDataModule):
 
 
     def train_dataloader(self):
-        return DataLoader(self.dataset_train, batch_size=self.batch_size,num_workers=self.num_workers)#pin_memory=pin_memory
+        return DataLoader(self.dataset_train, batch_size=self.batch_size,num_workers=self.num_workers,pin_memory=self.pin_memory)
 
     def val_dataloader(self):
-        return DataLoader(self.dataset_val, batch_size=self.batch_size,num_workers=self.num_workers)
+        return DataLoader(self.dataset_val, batch_size=self.batch_size,num_workers=self.num_workers,pin_memory=self.pin_memory)
 
     def test_dataloader(self):
-        return DataLoader(self.dataset_test, batch_size=self.batch_size,num_workers=self.num_workers)
+        return DataLoader(self.dataset_test, batch_size=self.batch_size,num_workers=self.num_workers,pin_memory=self.pin_memory)
 
     def predict_dataloader(self):
-        return DataLoader(self.dataset_predict, batch_size=self.batch_size,num_workers=self.num_workers)
+        return DataLoader(self.dataset_predict,batch_size=self.batch_size,num_workers=self.num_workers,pin_memory=self.pin_memory)
 
     # def teardown(self, stage: str):
     #     # Used to clean-up when the run is finished

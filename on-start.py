@@ -1,20 +1,13 @@
 ##part-1 clone the github repo
+#ipython kernel install --user --name=venv'
+
 
 import os
 
-os.system('python3 -m pip install gitpython')
+for lib in ['gitpython','requests','tqdm']:
+    os.system(f'pip install {lib}')
 
-# import git
-# from git import RemoteProgress
-
-# repo = git.Repo.clone_from("https://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@github.com/Maherstad/semantic-segmentation-and-domain-adaptation.git", "git_repo") 
-
-
-##part-2 import the raw data
-
-os.system('pip install requests')
-os.system('pip install tqdm')
-
+    
 import requests
 from tqdm import tqdm
 
@@ -37,15 +30,15 @@ for i,j in [('train',train),('test',test),('metadata',metadata)]:
 #create the virtual environment
 import subprocess
 
-print('creating virtual ennironvment...')
-create_env = subprocess.Popen(["conda", "create", "--name", "venv","python=3.9"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-out, err = create_env.communicate(input=b'y\n')
+# print('creating virtual ennironvment...')
+# create_env = subprocess.Popen(["conda", "create", "--name", "venv","python=3.9"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+# out, err = create_env.communicate(input=b'y\n')
 
-if create_env.returncode == 0:
-    print("Virtual environment created successfully, type conda env list to take a look")
-else:
-    print("Virtual environment creation failed")
-    print("Error: ", err.decode())
+# if create_env.returncode == 0:
+#     print("Virtual environment created successfully, type conda env list to take a look")
+# else:
+#     print("Virtual environment creation failed")
+#     print("Error: ", err.decode())
     
 ## install zip 
 print('installing zip...')
@@ -59,13 +52,7 @@ else:
     print("zip installation failed")
     print("Error: ", err.decode())
 
-
-print('installing dependencies in the virtual environment...')
     
-import subprocess
-import os
-#subprocess.check_output(['ls', '-l'])
-
 def execute_commands(cmds:list):
     for cmd in cmds:
         print(f'ATTEMPING TO EXECUTE : {cmd}')
@@ -80,10 +67,7 @@ def execute_commands(cmds:list):
 
 os.chdir("/workspace/semantic-segmentation-competition/")
 
-cmds_p1=['source activate venv',
-         'pip install -r requirements.txt',
-         'ipython kernel install --user --name=venv',
-         'mkdir raw_dataset',
+cmds_p1=['mkdir raw_dataset',
          'mv test.zip raw_dataset',
          'mv train.zip raw_dataset',
          'unzip metadata.zip',
