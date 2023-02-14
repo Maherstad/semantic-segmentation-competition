@@ -17,7 +17,7 @@ class torch_lightning_DataModule(pl.LightningDataModule):
     def __init__(self, 
                  data_dir: str = 'dataset',
                  #metadata:str='flair-one_metadata.json',
-                 batch_size: int = 16,
+                 batch_size: int = 64,
                  num_workers:int=1,
                  pin_memory: bool= True
                 ):
