@@ -1,0 +1,21 @@
+datamodule:
+  batch_size: 32
+  num_workers: 24
+  pin_memory: True
+
+trainer:
+  max_epochs: 5
+  accelerator: gpu
+  logger: wandb_logger
+
+model:
+  lr: 0.001
+  classes: 13
+  in_channels: 5
+  encoder_name: resnet34
+  activation: softmax
+  encoder_weights: imagenet
+  
+
+wandb_logger:
+  project: phase2_semantic_segmentation_initial_run

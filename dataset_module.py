@@ -81,6 +81,12 @@ class DatasetModule(torch.utils.data.Dataset): #if False, then test data will be
             image=self.read_img(img_path)
             image = img_as_float(image)
             #image=self.transforms(image)#.reshape(512,512,5)
+            image=torch.as_tensor(image, dtype=torch.float32)
+            image=image.unsqueeze(0)
+            image = torch.nn.functional.interpolate(image, size=(256, 256), mode='bilinear', align_corners=False)
+            image=image.squeeze(0)
+
+            
             
             
             msk_path=f'dataset/train/msk/{self.dataset.iloc[idx]["image_id"].replace("IMG","MSK")}'
@@ -89,6 +95,14 @@ class DatasetModule(torch.utils.data.Dataset): #if False, then test data will be
             
             mask=self.read_msk(msk_path)
             mask = img_as_float(mask)
+            
+            mask=torch.as_tensor(mask, dtype=torch.float32)
+            mask=mask.unsqueeze(0)
+            mask = torch.nn.functional.interpolate(mask, size=(256, 256), mode='bilinear', align_corners=False)
+            mask=mask.squeeze(0)
+            
+            
+            
             #mask=self.transforms(mask)#.reshape(512,512,13)
 
             return torch.as_tensor(image, dtype=torch.float),torch.as_tensor(mask, dtype=torch.float) #,self.metadata[self.dataset.iloc[idx]].to_dict()
@@ -102,5 +116,9 @@ class DatasetModule(torch.utils.data.Dataset): #if False, then test data will be
             image=self.read_image(test_img_path)
             image = img_as_float(image)
             #image=self.transforms(image).reshape(512,512,5)
+            image=torch.as_tensor(image, dtype=torch.float32)
+            image=image.unsqueeze(0)
+            image = torch.nn.functional.interpolate(image, size=(256, 256), mode='bilinear', align_corners=False)
+            image=image.squeeze(0)
 
             return torch.as_tensor(image, dtype=torch.float)#,self.metadata[self.dataset.iloc[idx]].to_dict()
