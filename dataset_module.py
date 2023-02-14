@@ -79,6 +79,8 @@ class DatasetModule(torch.utils.data.Dataset): #if False, then test data will be
             #img = imageio.imread(img_path)
             #image = self.transforms(img)
             image=self.read_img(img_path)
+            ##max_value = np.iinfo(image.dtype).max  # Get the maximum integer value for the data type
+            ##image = image / max_value
             image = img_as_float(image)
             #image=self.transforms(image)#.reshape(512,512,5)
             image=torch.as_tensor(image, dtype=torch.float32)
@@ -92,8 +94,9 @@ class DatasetModule(torch.utils.data.Dataset): #if False, then test data will be
             msk_path=f'dataset/train/msk/{self.dataset.iloc[idx]["image_id"].replace("IMG","MSK")}'
             #mask = imageio.imread(msk_path)
             #mask= self.transforms(mask)
-            
             mask=self.read_msk(msk_path)
+            ##mask_max_value = np.iinfo(mask.dtype).max  # Get the maximum integer value for the data type
+            ##mask = mask / mask_max_value
             mask = img_as_float(mask)
             
             mask=torch.as_tensor(mask, dtype=torch.float32)
@@ -114,6 +117,8 @@ class DatasetModule(torch.utils.data.Dataset): #if False, then test data will be
             #img = imageio.imread(test_img_path)
             #image = self.transforms(img)
             image=self.read_image(test_img_path)
+            ##max_value = np.iinfo(image.dtype).max  # Get the maximum integer value for the data type
+            ##image = image / max_value
             image = img_as_float(image)
             #image=self.transforms(image).reshape(512,512,5)
             image=torch.as_tensor(image, dtype=torch.float32)

@@ -1,10 +1,10 @@
 datamodule:
-  batch_size: 32
+  batch_size: 50
   num_workers: 24
   pin_memory: True
 
 trainer:
-  max_epochs: 5
+  max_epochs: 10
   accelerator: gpu
   logger: wandb_logger
 
