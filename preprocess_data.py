@@ -114,6 +114,6 @@ def delete_non_tif_images(dir_list:list=['./dataset/train/img','./dataset/train/
 
 if __name__ == "__main__":
     preprocess()
-    train_dev_split(toy_dataset=False)
+    train_dev_split(toy_dataset=True)
     delete_non_tif_images()
     

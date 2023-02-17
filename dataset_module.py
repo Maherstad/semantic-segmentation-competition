@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 from PIL import Image
-
+import albumentations as A
 from torch.utils.data import Dataset
 
 from skimage import io
@@ -37,13 +37,16 @@ class DatasetModule(torch.utils.data.Dataset): #if False, then test data will be
         #metadata: str,
         train:str,
         transforms= None, # data augmentation ^ transformation
-        num_classes=13
+        num_classes=13,
+        use_augmentations=True
     ):
 
         #self.metadata=pd.read_json(metadata)
         self.transforms= None #tt.Compose([tt.ToTensor()]) #tt.Resize(224), 
         self.train=train
         self.num_classes=num_classes
+        self.use_augmentations=use_augmentations
+        
         if self.train=='train':
             self.dataset=pd.read_json('metadata/train_df.jsonl',lines=True)
 
@@ -75,55 +78,51 @@ class DatasetModule(torch.utils.data.Dataset): #if False, then test data will be
         #metadata=self.metadata.iloc[:,idx].to_dict()
         if self.train=='train' or 'val':
             img_path=f'dataset/train/img/{self.dataset.iloc[idx]["image_id"]}'
-            #print('imagepath',img_path)
-            #img = imageio.imread(img_path)
-            #image = self.transforms(img)
             image=self.read_img(img_path)
-            ##max_value = np.iinfo(image.dtype).max  # Get the maximum integer value for the data type
-            ##image = image / max_value
-            image = img_as_float(image)
-            #image=self.transforms(image)#.reshape(512,512,5)
-            image=torch.as_tensor(image, dtype=torch.float32)
-            image=image.unsqueeze(0)
-            image = torch.nn.functional.interpolate(image, size=(256, 256), mode='bilinear', align_corners=False)
-            image=image.squeeze(0)
-
-            
-            
             
             msk_path=f'dataset/train/msk/{self.dataset.iloc[idx]["image_id"].replace("IMG","MSK")}'
-            #mask = imageio.imread(msk_path)
-            #mask= self.transforms(mask)
             mask=self.read_msk(msk_path)
-            ##mask_max_value = np.iinfo(mask.dtype).max  # Get the maximum integer value for the data type
-            ##mask = mask / mask_max_value
-            mask = img_as_float(mask)
-            
-            mask=torch.as_tensor(mask, dtype=torch.float32)
-            mask=mask.unsqueeze(0)
-            mask = torch.nn.functional.interpolate(mask, size=(256, 256), mode='bilinear', align_corners=False)
-            mask=mask.squeeze(0)
-            
-            
-            
-            #mask=self.transforms(mask)#.reshape(512,512,13)
+            mask = mask.astype(np.uint8) * 255 
 
-            return torch.as_tensor(image, dtype=torch.float),torch.as_tensor(mask, dtype=torch.float) #,self.metadata[self.dataset.iloc[idx]].to_dict()
+            transform_set = A.Compose([ A.Resize(width=256,height=256),
+                                            A.VerticalFlip(p=0.5),
+                                            A.HorizontalFlip(p=0.5),
+                                            A.RandomRotate90(p=0.5),
+                                          A.Normalize(mean=[0,0,0,0,0],std=[1,1,1,1,1],max_pixel_value=255,p=1.0)
+                                      ]
+                                             )
+
+            if self.use_augmentations:
+                sample = {"image" : image.swapaxes(0, 2).swapaxes(0, 1), "mask": mask.swapaxes(0, 2).swapaxes(0, 1)}
+                transformed_sample = transform_set(**sample)
+                image, mask = transformed_sample["image"].swapaxes(0, 2).swapaxes(1, 2).copy(), transformed_sample["mask"].swapaxes(0, 2).swapaxes(1, 2).copy()                 
+
+
+            image = img_as_float(image)
+
+            mask = mask.astype(np.bool)
+            
+            return torch.as_tensor(image, dtype=torch.float),torch.as_tensor(mask, dtype=torch.float)   #,self.metadata[self.dataset.iloc[idx]].to_dict()
 
         elif self.train=='test':
         
             test_img_path=f'dataset/test/img/{self.dataset.iloc[idx]["image_id"]}'
-            #print(test_img_path)
-            #img = imageio.imread(test_img_path)
-            #image = self.transforms(img)
             image=self.read_image(test_img_path)
-            ##max_value = np.iinfo(image.dtype).max  # Get the maximum integer value for the data type
-            ##image = image / max_value
+
+            transform_set = A.Compose([ A.Resize(width=256,height=256),
+                                            A.VerticalFlip(p=0.5),
+                                            A.HorizontalFlip(p=0.5),
+                                            A.RandomRotate90(p=0.5),
+                                           A.Normalize()],
+                                             )
+
+            if self.use_augmentations:
+                sample = {"image" : image.swapaxes(0, 2).swapaxes(0, 1)}
+                transformed_sample = transform_set(**sample)
+                image = transformed_sample["image"].swapaxes(0, 2).swapaxes(1, 2).copy()
+
+
             image = img_as_float(image)
-            #image=self.transforms(image).reshape(512,512,5)
-            image=torch.as_tensor(image, dtype=torch.float32)
-            image=image.unsqueeze(0)
-            image = torch.nn.functional.interpolate(image, size=(256, 256), mode='bilinear', align_corners=False)
-            image=image.squeeze(0)
+            
 
             return torch.as_tensor(image, dtype=torch.float)#,self.metadata[self.dataset.iloc[idx]].to_dict()
