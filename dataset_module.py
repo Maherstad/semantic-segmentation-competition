@@ -83,11 +83,18 @@ class DatasetModule(torch.utils.data.Dataset): #if False, then test data will be
             msk_path=f'dataset/train/msk/{self.dataset.iloc[idx]["image_id"].replace("IMG","MSK")}'
             mask=self.read_msk(msk_path)
             mask = mask.astype(np.uint8) * 255 
-
+            
+            
+#             transform_set = A.Compose([ A.Resize(width=256,height=256),
+#                                             A.VerticalFlip(p=0.5),
+#                                             A.HorizontalFlip(p=0.5),
+#                                             A.RandomRotate90(p=0.5),
+#                                           A.Normalize(mean=[0,0,0,0,0],std=[1,1,1,1,1],max_pixel_value=255,p=1.0)
+#                                       ]
+#                                              )
+            
+            
             transform_set = A.Compose([ A.Resize(width=256,height=256),
-                                            A.VerticalFlip(p=0.5),
-                                            A.HorizontalFlip(p=0.5),
-                                            A.RandomRotate90(p=0.5),
                                           A.Normalize(mean=[0,0,0,0,0],std=[1,1,1,1,1],max_pixel_value=255,p=1.0)
                                       ]
                                              )
@@ -100,7 +107,7 @@ class DatasetModule(torch.utils.data.Dataset): #if False, then test data will be
 
             image = img_as_float(image)
 
-            mask = mask.astype(np.bool)
+            mask = mask.astype(bool)
             
             return torch.as_tensor(image, dtype=torch.float),torch.as_tensor(mask, dtype=torch.float)   #,self.metadata[self.dataset.iloc[idx]].to_dict()
 
@@ -110,10 +117,8 @@ class DatasetModule(torch.utils.data.Dataset): #if False, then test data will be
             image=self.read_image(test_img_path)
 
             transform_set = A.Compose([ A.Resize(width=256,height=256),
-                                            A.VerticalFlip(p=0.5),
-                                            A.HorizontalFlip(p=0.5),
-                                            A.RandomRotate90(p=0.5),
-                                           A.Normalize()],
+                                          A.Normalize(mean=[0,0,0,0,0],std=[1,1,1,1,1],max_pixel_value=255,p=1.0)
+                                      ]
                                              )
 
             if self.use_augmentations:

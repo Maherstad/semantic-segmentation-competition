@@ -19,7 +19,8 @@ class torch_lightning_DataModule(pl.LightningDataModule):
                  #metadata:str='flair-one_metadata.json',
                  batch_size: int = 64,
                  num_workers:int=1,
-                 pin_memory: bool= True
+                 pin_memory: bool= True,
+                 persistent_workers=True
                 ):
         super().__init__()
         self.data_dir = data_dir
@@ -27,6 +28,7 @@ class torch_lightning_DataModule(pl.LightningDataModule):
         self.batch_size = batch_size
         self.num_workers=num_workers
         self.pin_memory=pin_memory
+        self.persistent_workers=persistent_workers
     
     def setup(self, stage: str):
         #dataset, metadata, train
@@ -38,16 +40,16 @@ class torch_lightning_DataModule(pl.LightningDataModule):
 
 
     def train_dataloader(self):
-        return DataLoader(self.dataset_train, batch_size=self.batch_size,num_workers=self.num_workers,pin_memory=self.pin_memory)
+        return DataLoader(self.dataset_train, batch_size=self.batch_size,num_workers=self.num_workers,pin_memory=self.pin_memory,persistent_workers=self.persistent_workers)
 
     def val_dataloader(self):
-        return DataLoader(self.dataset_val, batch_size=self.batch_size,num_workers=self.num_workers,pin_memory=self.pin_memory)
+        return DataLoader(self.dataset_val, batch_size=self.batch_size,num_workers=self.num_workers,pin_memory=self.pin_memory,persistent_workers=self.persistent_workers)
 
     def test_dataloader(self):
-        return DataLoader(self.dataset_test, batch_size=self.batch_size,num_workers=self.num_workers,pin_memory=self.pin_memory)
+        return DataLoader(self.dataset_test, batch_size=self.batch_size,num_workers=self.num_workers,pin_memory=self.pin_memory,persistent_workers=self.persistent_workers)
 
     def predict_dataloader(self):
-        return DataLoader(self.dataset_predict,batch_size=self.batch_size,num_workers=self.num_workers,pin_memory=self.pin_memory)
+        return DataLoader(self.dataset_predict,batch_size=self.batch_size,num_workers=self.num_workers,pin_memory=self.pin_memory,persistent_workers=self.persistent_workers)
 
     # def teardown(self, stage: str):
     #     # Used to clean-up when the run is finished

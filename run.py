@@ -16,7 +16,7 @@ with open("hyperparameters.yaml", "r") as stream:
 
 early_stopping = EarlyStopping(
     monitor='val_loss',
-    patience=500,
+    patience=5,
     mode='min'
 )
         

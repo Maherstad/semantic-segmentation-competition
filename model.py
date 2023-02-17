@@ -14,6 +14,10 @@ from dataset_module import DatasetModule
 
 #torch.set_float32_matmul_precision('medium')
 
+# create a device object explicitly
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+
 ###
 class SemanticSegmentationModel(pl.LightningModule):
     def __init__(self,encoder_name,classes,in_channels,activation,encoder_weights,lr):
@@ -24,12 +28,8 @@ class SemanticSegmentationModel(pl.LightningModule):
         self.activation=activation
         self.encoder_weights=encoder_weights
         self.lr=lr
-
         self.loss_fn = nn.CrossEntropyLoss()
         self.save_hyperparameters()
-        #print('XXXXXXXXXXXXXXXX',encoder_name)
-        #print('XXXXXXXXXXXXXXXXZZZ',self.encoder_weights)
-
         self.model = smp.Unet( 
            encoder_name=self.encoder_name, 
            classes=self.classes, 
@@ -46,10 +46,11 @@ class SemanticSegmentationModel(pl.LightningModule):
         images, labels = batch
         outputs = self.model(images)
         labels = labels.squeeze(1)
+        
+        class_weights = torch.tensor([1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.0], dtype=torch.float32, device='cuda')
+        self.loss_fn.weight = class_weights
+
         loss = self.loss_fn(outputs, labels)
-        
-        
-        #outputs : output of model > logits /// labels > y ///images > x 
         self.log('train_loss',loss, on_step=False, on_epoch=True)
         return loss
     
@@ -64,13 +65,12 @@ class SemanticSegmentationModel(pl.LightningModule):
         images, labels = batch
         outputs = self.model(images)
         labels = labels.squeeze(1)
-        #print(f'{labels.shape} is shape of label in the val step method')
-        #print(f'{outputs.shape} is shape of outputs in the val step method')
-
-        loss = self.loss_fn(outputs, labels)
-        # Log loss and accuracy
-        self.log('val_loss', loss, on_step=False, on_epoch=True)
+        class_weights = torch.tensor([1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.0], dtype=torch.float32, device='cuda')
+        self.loss_fn.weight = class_weights
         
+        
+        loss = self.loss_fn(outputs, labels)
+        self.log('val_loss', loss, on_step=False, on_epoch=True)
         return {'val_loss': loss}
 
 #     def validation_epoch_end(self, outputs):

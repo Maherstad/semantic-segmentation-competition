@@ -1,15 +1,16 @@
 datamodule:
-  batch_size: 50
-  num_workers: 24
+  batch_size: 32
+  num_workers: 6
   pin_memory: True
+  persistent_workers: False
 
 trainer:
-  max_epochs: 10
+  max_epochs: 20
   accelerator: gpu
   logger: wandb_logger
 
 model:
-  lr: 0.001
+  lr: 0.02
   classes: 13
   in_channels: 5
   encoder_name: resnet34
@@ -18,4 +19,4 @@ model:
   
 
 wandb_logger:
-  project: phase2_semantic_segmentation_initial_run
+  project: semantic_segmentation_main_run
