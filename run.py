@@ -29,5 +29,6 @@ if __name__=='__main__':
     wandb_logger=WandbLogger(**hyperparameters["wandb_logger"])
     trainer = pl.Trainer(wandb_logger,**hyperparameters["trainer"])
     trainer.fit(model,data)
-
+    trainer.save_checkpoint('model.ckpt')
+    #trainer.fit(model,data, ckpt_path="model.ckpt")
 
