@@ -1,6 +1,6 @@
 datamodule:
   batch_size: 32
-  num_workers: 6
+  num_workers: 12
   pin_memory: True
   persistent_workers: False
 
@@ -10,13 +10,13 @@ trainer:
   logger: wandb_logger
 
 model:
-  lr: 0.02
+  lr: 0.001
   classes: 13
   in_channels: 5
   encoder_name: resnet34
   activation: softmax
   encoder_weights: imagenet
-  
+
 
 wandb_logger:
   project: semantic_segmentation_main_run

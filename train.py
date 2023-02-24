@@ -1,10 +1,19 @@
 import yaml
-from pytorch_lightning.callbacks import EarlyStopping #, ModelCheckpoint
-from model import SemanticSegmentationModel
-from pytorch_lightning.loggers import WandbLogger
-from torchlightning_module import torch_lightning_DataModule
-from dataset_module import DatasetModule
+import argparse
 import pytorch_lightning as pl
+
+from pytorch_lightning.loggers import WandbLogger
+
+from model import SemanticSegmentationModel
+from dataset_module import DatasetModule
+from torchlightning_module import torch_lightning_DataModule
+
+
+# define arguments
+parser = argparse.ArgumentParser()
+parser.add_argument("--checkpoint_path", type=str, default=None,
+                    help="path to the saved checkpoint")
+args = parser.parse_args()
 
 
 with open("hyperparameters.yaml", "r") as stream:
@@ -13,22 +22,23 @@ with open("hyperparameters.yaml", "r") as stream:
     except yaml.YAMLError as exc:
         print(exc)
 
+# set checkpoint path from argument
+if args.checkpoint_path is not None:
+    hyperparameters["checkpoint_path"] = args.checkpoint_path
 
-early_stopping = EarlyStopping(
-    monitor='val_loss',
-    patience=5,
-    mode='min'
-)
-        
-        
+
+
 # Pass hyperparameters to your PyTorch Lightning model
 
+
+
 if __name__=='__main__':
+
+    ## pl components
     model = SemanticSegmentationModel(**hyperparameters["model"])
     data=torch_lightning_DataModule(**hyperparameters["datamodule"])
     wandb_logger=WandbLogger(**hyperparameters["wandb_logger"])
+
+    #create trainer and fit the model
     trainer = pl.Trainer(wandb_logger,**hyperparameters["trainer"])
     trainer.fit(model,data)
-    trainer.save_checkpoint('model.ckpt')
-    #trainer.fit(model,data, ckpt_path="model.ckpt")
-

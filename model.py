@@ -30,10 +30,10 @@ class SemanticSegmentationModel(pl.LightningModule):
         self.lr=lr
         self.loss_fn = nn.CrossEntropyLoss()
         self.save_hyperparameters()
-        self.model = smp.Unet( 
-           encoder_name=self.encoder_name, 
-           classes=self.classes, 
-           activation=self.activation, 
+        self.model = smp.Unet(
+           encoder_name=self.encoder_name,
+           classes=self.classes,
+           activation=self.activation,
            encoder_weights=self.encoder_weights,
             in_channels=self.in_channels,
               )
@@ -46,15 +46,14 @@ class SemanticSegmentationModel(pl.LightningModule):
         images, labels = batch
         outputs = self.model(images)
         labels = labels.squeeze(1)
-        
+
         class_weights = torch.tensor([1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.0], dtype=torch.float32, device='cuda')
         self.loss_fn.weight = class_weights
 
         loss = self.loss_fn(outputs, labels)
         self.log('train_loss',loss, on_step=False, on_epoch=True)
-        return loss
-    
-    
+        return {'loss': loss}
+
 #     def training_epoch_end(self, outputs):
 #         avg_loss = torch.stack([x["loss"] for x in outputs]).mean()
 #         self.log("avg_train_loss", avg_loss)
@@ -67,8 +66,8 @@ class SemanticSegmentationModel(pl.LightningModule):
         labels = labels.squeeze(1)
         class_weights = torch.tensor([1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.0], dtype=torch.float32, device='cuda')
         self.loss_fn.weight = class_weights
-        
-        
+
+
         loss = self.loss_fn(outputs, labels)
         self.log('val_loss', loss, on_step=False, on_epoch=True)
         return {'val_loss': loss}
@@ -86,9 +85,25 @@ class SemanticSegmentationModel(pl.LightningModule):
 
 
     def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr=self.lr)
+        optimizer = torch.optim.Adam(self.parameters(), lr=self.lr)
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,
+                                                               mode='min',
+                                                               factor=0.1,
+                                                               patience=3,
+                                                               verbose=True)
+        early_stop_callback = EarlyStopping(monitor='val_loss', patience=10, mode='min')
+        checkpoint_callback = ModelCheckpoint(dirpath='./checkpoints',
+                                               filename='model-{epoch:02d}-{val_loss:.2f}',
+                                               monitor='val_loss',
+                                               save_top_k=3,
+                                               mode='min')
+        return {
+            'optimizer': optimizer,
+            'lr_scheduler': scheduler,
+            'monitor': 'val_loss',
+            'callbacks': [early_stop_callback, checkpoint_callback]
+        }
 
-    
 # def lr_schedule(step):
 #    lr = 0.001
 #    if step < 10:

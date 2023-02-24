@@ -3,13 +3,9 @@
 
 
 import os
-
-for lib in ['gitpython','requests','tqdm']:
-    os.system(f'pip install {lib}')
-
-    
 import requests
 from tqdm import tqdm
+import subprocess
 
 train='https://cos-hdsign-simv-defi.storage-eb4.cegedim.cloud/cos-hdsign-simv-defi/data_flair-one/flair-one_train.zip'
 test='https://cos-hdsign-simv-defi.storage-eb4.cegedim.cloud/cos-hdsign-simv-defi/data_flair-one/flair-one_test.zip'
@@ -22,13 +18,12 @@ def download_url(url, save_path, chunk_size=128):
         print(save_path)
         for chunk in tqdm(r.iter_content(chunk_size=chunk_size)):
             fd.write(chunk)
-            
+
 for i,j in [('train',train),('test',test),('metadata',metadata)]:
     download_url(j,f'/workspace/semantic-segmentation-competition/{i}.zip',512)
 
 
 #create the virtual environment
-import subprocess
 
 # print('creating virtual ennironvment...')
 # create_env = subprocess.Popen(["conda", "create", "--name", "venv","python=3.9"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -39,8 +34,8 @@ import subprocess
 # else:
 #     print("Virtual environment creation failed")
 #     print("Error: ", err.decode())
-    
-## install zip 
+
+## install zip
 print('installing zip...')
 
 install_zip = subprocess.Popen(["sudo", "apt-get", "install", "zip"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -52,7 +47,7 @@ else:
     print("zip installation failed")
     print("Error: ", err.decode())
 
-    
+
 def execute_commands(cmds:list):
     for cmd in cmds:
         print(f'ATTEMPING TO EXECUTE : {cmd}')
@@ -63,7 +58,7 @@ def execute_commands(cmds:list):
             print(f'successful execution of {cmd}')
         except:
             print('command was not executed')
-            
+
 
 os.chdir("/workspace/semantic-segmentation-competition/")
 
@@ -79,18 +74,10 @@ execute_commands(cmds_p1)
 print('unzipping the raw data...(this might take a while)')
 
 
-os.chdir('/workspace/semantic-segmentation-competition/raw_dataset/')    
+os.chdir('/workspace/semantic-segmentation-competition/raw_dataset/')
 cmds_p2=['unzip test.zip','unzip train.zip']
 execute_commands(cmds_p2)
 
-os.chdir('/workspace/semantic-segmentation-competition/raw_dataset/')    
+os.chdir('/workspace/semantic-segmentation-competition/raw_dataset/')
 cmds_p3=['rm test.zip','rm train.zip']
 execute_commands(cmds_p3)
-
-
-
-
-
-
-
-
