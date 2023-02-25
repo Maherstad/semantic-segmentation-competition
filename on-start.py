@@ -1,16 +1,17 @@
 ##part-1 clone the github repo
 #ipython kernel install --user --name=venv
-
-
+#conda create --name venv python=3.9
 import os
 import requests
 from tqdm import tqdm
 import subprocess
 
+########################################################################
+## download the competition data
+###
 train='https://cos-hdsign-simv-defi.storage-eb4.cegedim.cloud/cos-hdsign-simv-defi/data_flair-one/flair-one_train.zip'
 test='https://cos-hdsign-simv-defi.storage-eb4.cegedim.cloud/cos-hdsign-simv-defi/data_flair-one/flair-one_test.zip'
 metadata='https://cos-hdsign-simv-defi.storage-eb4.cegedim.cloud/cos-hdsign-simv-defi/data_flair-one/flair-one_metadata.zip'
-
 
 def download_url(url, save_path, chunk_size=128):
     r = requests.get(url, stream=True)
@@ -22,6 +23,7 @@ def download_url(url, save_path, chunk_size=128):
 for i,j in [('train',train),('test',test),('metadata',metadata)]:
     download_url(j,f'/workspace/semantic-segmentation-competition/{i}.zip',512)
 
+########################################################################
 
 #create the virtual environment
 
@@ -35,6 +37,8 @@ for i,j in [('train',train),('test',test),('metadata',metadata)]:
 #     print("Virtual environment creation failed")
 #     print("Error: ", err.decode())
 
+########################################################################
+
 ## install zip
 print('installing zip...')
 
@@ -47,6 +51,9 @@ else:
     print("zip installation failed")
     print("Error: ", err.decode())
 
+########################################################################
+
+#unzipping the competition data and moving it to ./raw_dataset as well as removing the original zipped files afterwards
 
 def execute_commands(cmds:list):
     for cmd in cmds:
@@ -71,9 +78,6 @@ cmds_p1=['mkdir raw_dataset',
 execute_commands(cmds_p1)
 
 
-print('unzipping the raw data...(this might take a while)')
-
-
 os.chdir('/workspace/semantic-segmentation-competition/raw_dataset/')
 cmds_p2=['unzip test.zip','unzip train.zip']
 execute_commands(cmds_p2)
@@ -81,3 +85,5 @@ execute_commands(cmds_p2)
 os.chdir('/workspace/semantic-segmentation-competition/raw_dataset/')
 cmds_p3=['rm test.zip','rm train.zip']
 execute_commands(cmds_p3)
+
+########################################################################

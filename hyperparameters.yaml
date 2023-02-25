@@ -1,16 +1,16 @@
 datamodule:
   batch_size: 32
-  num_workers: 12
+  num_workers: 24
   pin_memory: True
   persistent_workers: False
 
 trainer:
-  max_epochs: 20
+  max_epochs: 50
   accelerator: gpu
   logger: wandb_logger
 
 model:
-  lr: 0.001
+  lr: 0.02
   classes: 13
   in_channels: 5
   encoder_name: resnet34
