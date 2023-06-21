@@ -1,8 +1,8 @@
 # semantic-segmentation-and-domain-adaptation
 This repository contains my implementation of the competition: Semantic segmentation and domain adaptation challenge proposed by the French National Institute of Geographical and Forest Information (IGN). <br /><br />
 
+![flair-1_patches](https://github.com/Maherstad/semantic-segmentation-competition/assets/30124102/2fcfcbad-0d4f-4241-bf30-b10d2513bed4)
 
-![flair-1_patches](https://github.com/Maherstad/semantic-segmentation-competition/assets/30124102/34a2151c-24a4-45ad-a396-51d8c2029c87)
 <br />
 
 ## Repository Structure
